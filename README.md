@@ -24,13 +24,37 @@
 ## ROS Network
 ![image](https://https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros%20network.jpg)
 
+## detection node
+* Publisher
+     * `/desired/input/box_array`, `BoundingBoxArray`
+     * `/detection_result/number_of_obstacle`, `Int32`
+     * `/detection_result/number_of_human`, `Int32`
+     * `/detection_result/number_of_injury`, `Int32`
+     * `/detected_human`, `Image`
+     * `/detected_human_gesture`, `String`
+
+* Subscriber
+     * `/camera/color/image_raw`, `Image`
+     * `/camera/aligned_depth_to_color/image_raw`, `Image`
+     * `/camera/aligned_depth_to_color/camera_info`, `CameraInfo`
+     * `/camera/color/camera_info`, `CameraInfo`
+     * `/desired_path/local_trajectory`, `Path`
 
 ## vision navigation node
-     - Publisher
-       - Second nested list item
-       
-     - Subscriber
-       - Second nested list item
+* Publisher
+     * `/drone/input_postion/pose`, `PoseStamped`
+     * `/desired_path/position`, `MarkerArray`
+     * `/desired_path/validation_position`, `MarkerArray`
+     * `/desired_path/local_marker`, `MarkerArray`
+     * `/desired_path/local_trajectory`, `Path`
+
+* Subscriber
+     * `/drone/nagvation/pos`, `PoseStamped`
+     * `/auto_mode/status`, `BoolStamped`
+     * `/extract_indices/output`, `PointCloud2`
+     * `/detection_result/number_of_obstacle`, `Int32`
+     * `/detection_result/number_of_human`, `Int32`
+     * `/detection_result/number_of_injury`, `Int32`
 
 ## drone control node
 
