@@ -20,3 +20,22 @@
 |Darknet                | Model Training  |
 |ONNX                   | Convert Model   |
 |TensorRT               | Increase speed  |
+
+## ROS Network
+![image](https://https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros%20network.jpg)
+
+
+## vision navigation node
+     - Publisher
+       - Second nested list item
+       
+     - Subscriber
+       - Second nested list item
+
+## drone control node
+
+
+## servo node
+
+
+## pose estimation node
