@@ -22,7 +22,7 @@
 |TensorRT               | Increase speed  |
 
 ## ROS Network
-![image](https://https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros_network.jpg)
+![image](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros_network.jpg)
 
 ## detection node
 * Publisher
