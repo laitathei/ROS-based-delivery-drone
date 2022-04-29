@@ -20,6 +20,7 @@
 |Darknet                | Model Training  |
 |ONNX                   | Convert Model   |
 |TensorRT               | Increase speed  |
+|Google Collaboratory   | Train model     |
 
 ## ROS Network
 ![image](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros_network.jpg)
