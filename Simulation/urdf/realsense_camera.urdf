@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<robot name="D435i">
+  <joint name="camera_imu_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="imu_link"/>
+    <origin rpy="0  0  0" xyz="0  0  0"/>
+    <axis xyz="1  0  0"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="camera_color_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_color_frame"/>
+    <origin rpy="3.14 -1.57  1.57" xyz="0.0325  0      0"/>
+    <axis xyz="0       0.99999  0.00238"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="camera_ired1_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_ired1_frame"/>
+    <origin rpy="3.14 -1.57  1.57" xyz="0.02  0    0"/>
+    <axis xyz="0       0.99999  0.00238"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="camera_ired2_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_ired2_frame"/>
+    <origin rpy="3.14 -1.57  1.57" xyz="-0.03  0    0"/>
+    <axis xyz="0       0.99999  0.00238"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <joint name="camera_depth_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_depth_frame"/>
+    <origin rpy="3.14 -1.57  1.57" xyz="0.0325  0      0"/>
+    <axis xyz="0       0.99999  0.00238"/>
+    <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+  </joint>
+  <link name="camera_link">
+    <inertial>
+      <mass value="0.0564"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="4.1e-05" ixy="0" ixz="0" iyy="5.9e-06" iyz="0" izz="5.9e-06"/>
+    </inertial>
+    <collision name="collision">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <box size="0.02505 0.090 0.025"/>
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <geometry>
+        <mesh filename="package://offboard_test/models/D435i/meshes/realsense_d435.stl" scale="1.0 1.0 1.0"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.0015"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+  <link name="camera_color_frame">
+    <inertial>
+      <mass value="0.0015"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+  <link name="camera_ired1_frame">
+    <inertial>
+      <mass value="0.0015"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+  <link name="camera_ired2_frame">
+    <inertial>
+      <mass value="0.0015"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+  <link name="camera_depth_frame">
+    <inertial>
+      <mass value="0.0015"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+    </inertial>
+  </link>
+</robot>
