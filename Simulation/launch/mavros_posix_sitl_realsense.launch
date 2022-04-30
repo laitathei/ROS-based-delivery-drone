@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- send urdf to param server -->
+    <param name="robot_description" command="cat '$(find offboard_test)/urdf/iris_realsense_camera.urdf'" />
+
+    <!-- Send fake joint values-->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="use_gui" value="false"/>
+    </node>
+
+    <!-- Send robot states to tf
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>-->
+
+    <!--spawn a robot in gazebo world
+    <node name="robot_spawn" pkg="gazebo_ros" type="spawn_model" respawn="false" 
+     output="screen" args="-urdf -param robot_description -model iris_D435i"/> -->
+
+    <!-- MAVROS posix SITL environment launch script -->
+    <!-- launches MAVROS, PX4 SITL, Gazebo environment, and spawns vehicle -->
+    <!-- vehicle pose -->
+    <arg name="x" default="0"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="0"/>
+    <arg name="R" default="0"/>
+    <arg name="P" default="0"/>
+    <arg name="Y" default="0.707"/>
+    <!-- vehicle model and world -->
+    <arg name="est" default="ekf2"/>
+    <arg name="vehicle" default="iris"/>
+    <arg name="world" default="$(find offboard_test)/world/mulit_obstacle.world"/>
+    <!-- <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>-->
+    <arg name="sdf" default="$(find offboard_test)/sdf/iris_realsense_camera.sdf"/>
+
+    <!-- gazebo configs -->
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+    <arg name="respawn_gazebo" default="false"/>
+    <!-- MAVROS configs -->
+    <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+    <arg name="respawn_mavros" default="false"/>
+    <!-- PX4 configs -->
+    <arg name="interactive" default="true"/>
+    <!-- PX4 SITL and Gazebo -->
+    <include file="$(find px4)/launch/posix_sitl.launch">
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="z" value="$(arg z)"/>
+        <arg name="R" value="$(arg R)"/>
+        <arg name="P" value="$(arg P)"/>
+        <arg name="Y" value="$(arg Y)"/>
+        <arg name="world" value="$(arg world)"/>
+        <arg name="vehicle" value="$(arg vehicle)"/>
+        <arg name="sdf" value="$(arg sdf)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="interactive" value="$(arg interactive)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+    </include>
+    <!-- MAVROS -->
+    <include file="$(find mavros)/launch/px4.launch">
+        <!-- GCS link is provided by SITL -->
+        <arg name="gcs_url" value=""/>
+        <arg name="fcu_url" value="$(arg fcu_url)"/>
+        <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
+    </include>
+
+
+
+    <!-- 1. Start the inference program
+    <node name="yolov4_tiny" pkg="yolov4_tiny" type="inference_ros_obstacle.py" output="screen" />-->
+
+    <node name="tf_transform_cloud"
+            pkg="nodelet" type="nodelet"
+            args="standalone jsk_pcl_utils/TfTransformCloud">
+        <remap from="~input" to="/camera/depth/color/points"/>
+        <rosparam>
+            target_frame_id: Gazebo
+        </rosparam>
+    </node>
+
+    <!-- 2. downsample -->
+    <!-- for voxel grid -->
+    <node name="sample_manager" pkg="nodelet" type="nodelet" args="manager"/>
+    <node name="voxel_grid_large_scale"
+        pkg="nodelet" type="nodelet"
+        args="load jsk_pcl/VoxelGridLargeScale sample_manager">
+        <remap from="~input" to="/tf_transform_cloud/output"/>
+        <rosparam>
+            leaf_size: 0.1
+        </rosparam>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="passthrough_z" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/voxel_grid_large_scale/output" />
+        <rosparam>
+            filter_field_name: z
+            filter_limit_min: 0.1
+            filter_limit_max: 1000
+            filter_limit_negative: False
+        </rosparam>
+    </node>
+
+
+
+    <!-- Run a passthrough filter to clean NaNs
+    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="passthrough_y" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/voxel_grid_large_scale/output" />
+        <rosparam>
+            filter_field_name: y
+            filter_limit_min: -0.1
+            filter_limit_max: 1000
+            filter_limit_negative: True
+        </rosparam>
+    </node>
+    <node pkg="nodelet" type="nodelet" name="passthrough_x" args="load pcl/PassThrough pcl_manager" output="screen">
+        <remap from="~input" to="/passthrough_y/output" />
+        <rosparam>
+            filter_field_name: x
+            filter_limit_min: -1.5
+            filter_limit_max: 1.5
+            filter_limit_negative: False
+        </rosparam>
+    </node> -->
+
+    <!-- 3. Implement bounding box -->
+    <!-- <arg name="INPUT_CLOUD" value="/d435/depth/color/points" />-->
+    <arg name="INPUT_CLOUD" value="/passthrough_z/output" />
+    <arg name="INPUT_BOX_ARRAY" value="/desired/input/box_array" />
+    <node name="attention_clipper"
+            pkg="nodelet" type="nodelet"
+            args="standalone jsk_pcl/AttentionClipper">
+        <remap from="~input/points" to="$(arg INPUT_CLOUD)" />
+        <remap from="~input/box_array" to="$(arg INPUT_BOX_ARRAY)" />
+        <rosparam>
+            use_multiple_attention: True
+        </rosparam>
+    </node>
+    <node name="extract_indices"
+            pkg="jsk_pcl_ros" type="extract_indices">
+        <remap from="~input" to="$(arg INPUT_CLOUD)" />
+        <remap from="~indices" to="/attention_clipper/output/point_indices" />
+    </node>
+
+    <!-- for octomap which make use of octree voxel grid output as input-->
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+		<param name="resolution" value="0.05" />
+		
+
+		<param name="frame_id" type="string" value="Gazebo" />
+		<param name="pointcloud_max_z" value="10.0" />
+		<param name="pointcloud_min_z" value="0" />
+
+		<param name="sensor_model/max_range" value="5.0" />
+
+		<remap from="cloud_in" to="/camera/depth/color/points" />
+	</node>
+
+
+    <node pkg="tf" type="static_transform_publisher" name="TF_camera_depth_frame_to_base_link" args="0.12 0 0 -0.5 0.5 -0.5 0.5 base_link D435i::camera_depth_frame 100" /> -->
+    <node pkg="tf" type="static_transform_publisher" name="TF_gazebo_world_to_gazebo" args="0 0 0 0 0 -0.707 0.707 world Gazebo 100" /> -->
+    <node pkg="tf" type="static_transform_publisher" name="TF_gazebo_gazebo_to_map" args="0 0 0 0 0 0 1 Gazebo map 100" /> -->
+
+    <!-- Show in Rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find offboard_test)/rviz/rviz.rviz" />
+
+
+    <!-- control node: parameters -->
+    <arg name="onboard" default="true" />
+    <arg name="image" default="false" />
+    <!-- control node -->
+    <node pkg="dron_control_node" type="control_node.py" name="control_node" output="screen">
+        <!-- true=onboard, false=offboard -->
+        <param name="onboard" type="bool" value="$(arg onboard)" />
+        <!-- true=image, false=turn off image -->
+        <param name="image" type="bool" value="$(arg image)" />
+    </node>
+    
+
+
+</launch>
