@@ -176,3 +176,21 @@ cd ../
 catkin_make
 source ~/catkin_ws/devel/setup.bash
 ```
+
+### 2. Usage
+### 2.1 Place the models
+![image](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/photos/model_destination.png)
+
+### 2.2 World selection
+Change the world file to yours in `mavros_posix_sitl_realsense.launch`
+```
+<arg name="world" default="$(find (your package name))/world/(your desired world name).world"/>
+```
+
+### 2.3 Launch the simulation scene
+```
+roslaunch (your package name) mavros_posix_sitl_realsense.launch
+```
+
+
+
