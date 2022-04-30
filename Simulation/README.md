@@ -1,288 +1,178 @@
-### YOLOv4-Darknet-TensorRT
-### 1 Training in Darknet
-### 1.1 Download YOLOv4-Darknet
-```
-git clone https://github.com/AlexeyAB/darknet
-```
+### Gazebo simulation
 
-### 1.2 Change YOLOv4-Darknet configuration
+### 1. Software Prerequisite
+### 1.1 PX4 ROS Gazebo environment
 ```
-cd darknet/
-gedit Makefile
+pip3 install --user empy
+pip3 install --user toml
+pip3 install --user numpy
+pip3 install --user pyros-genmsg
+pip3 install kconfiglib
+pip3 install --user packaging
+pip3 install --user jinja2
+pip3 install --user jsonschema
+sudo apt-get install ros-melodic-mavros ros-melodic-mavros-extras     ** for melodic
+sudo apt-get install ros-noetic-mavros ros-noetic-mavros-extras     ** for noetic
+sudo apt install gcc-arm-none-eabi
+sudo apt install gperf
+sudo apt-get install python-dev python3-dev libxml2-dev libxslt1-dev zlib1g-dev
+sudo apt upgrade libignition-math2          **for gazebo error which cause the gazebo cannot launch
 
+gedit ~/.bashrc
+#put this statement in .bashrc
+export OPENBLAS_CORETYPE=ARMV8 python3
 
-GPU=1
-CUDNN=1
-CUDNN_HALF=1
-OPENCV=1
-AVX=0
-OPENMP=0
-LIBSO=1
-ZED_CAMERA=0
-ZED_CAMERA_v2_8=0
+cd ~/Desktop
+wget https://raw.githubusercontent.com/PX4/Devguide/master/build_scripts/ubuntu_sim_ros_melodic.sh
+wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+chmod +x install_geographiclib_datasets.sh
+chmod +x ubuntu_sim_ros_melodic.sh
+sudo bash install_geographiclib_datasets.sh
+source ubuntu_sim_ros_melodic.sh
+cd
 
-# set GPU=1 and CUDNN=1 to speedup on GPU
-# set CUDNN_HALF=1 to further speedup 3 x times (Mixed-precision on Tensor Cores) GPU: Volta, Xavier, Turing and higher
-# set AVX=1 and OPENMP=1 to speedup on CPU (if error occurs then set AVX=0)
-# set ZED_CAMERA=1 to enable ZED SDK 3.0 and above
-# set ZED_CAMERA_v2_8=1 to enable ZED SDK 2.X
+git clone https://github.com/PX4/PX4-Autopilot.git
+cd ~/PX4-Autopilot
+git checkout v1.12.3
+bash ~/PX4-Autopilot/Tools/setup/ubuntu.sh --no-nuttx
+git submodule update --init --recursive
 
-make
-```
+make px4_fmu-v3_default **refer to https://docs.px4.io/master/en/dev_setup/building_px4.html to check version which only for hardware setup
 
-### 1.3 Build the data folder structure
-```
-cd /home/laitathei/Desktop/darknet
-mkdir VOCdevkit
-cd VOCdevkit
-mkdir VOC2007
-cd VOC2007
-mkdir Annotations
-mkdir ImageSets
-mkdir JPEGImages
-cd ImageSets
-mkdir Main
-```
+cd ~/PX4-Autopilot
+make px4_sitl_default gazebo
 
-### 1.4 Seperate dataset to train,test,val and Change the VOC format to YOLO format
-```
-mv /home/laitathei/Desktop/darknet/voc2yolo4.py /home/laitathei/Desktop/darknet/VOCdevkit/VOC2007
-cd /home/laitathei/Desktop/darknet/VOCdevkit/VOC2007
-python3 voc2yolo4.py
-mv /home/laitathei/Desktop/darknet/voc_annotation.py /home/laitathei/Desktop/darknet/VOCdevkit
-cd /home/laitathei/Desktop/darknet/VOCdevkit
-python3 voc_annotation.py
+## Type the following code into .bashrc
+source ~/PX4-Autopilot/Tools/setup_gazebo.bash ~/PX4-Autopilot ~/PX4-Autopilot/build/px4_sitl_default
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:~/PX4-Autopilot
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:~/PX4-Autopilot/Tools/sitl_gazebo
+
+roslaunch mavros px4.launch fcu_url:="udp://:14540@127.0.0.1:14557"   **only sitl with gazebo
+roslaunch px4 mavros_posix_sitl.launch        **SITL and MAVROS
 ```
 
-### 1.5 Change ```voc.names``` setting
+### 1.2 Realsense Gazebo plugin
 ```
-cp /home/laitathei/Desktop/darknet/data/voc.names /home/laitathei/Desktop/darknet/VOCdevkit
-gedit voc.names
-
-obstacle
-human
-injury
+cd ~/catkin_ws/src
+git clone https://github.com/nilseuropa/realsense_ros_gazebo.git
+cd ~/catkin_ws
+catkin_make
 ```
 
-### 1.5 Change ```voc.data``` setting
+### 1.3 jsk_pcl_ros installation
 ```
-cp /home/laitathei/Desktop/darknet/cfg/voc.data /home/laitathei/Desktop/darknet/VOCdevkit
-gedit voc.data
+# Ubuntu 18.04
+sudo apt-get install ros-melodic-jsk-pcl-ros
+sudo apt-get install ros-melodic-jsk-rviz-plugins
+sudo apt-get install ros-melodic-ros-numpy
 
-classes= 3
-train  = /home/laitathei/Desktop/darknet/VOCdevkit/2007_train.txt
-valid  = /home/laitathei/Desktop/darknet/VOCdevkit/2007_test.txt
-names = /home/laitathei/Desktop/darknet/VOCdevkit/voc.names
-backup = /home/laitathei/Desktop/darknet/backup/
-```
-
-### 1.6 Change ```yolov4-tiny.cfg``` setting, Remember change [convolutional] & [yolo] in line 226 and 270
-```
-cp /home/laitathei/Desktop/darknet/cfg/yolov4-tiny.cfg /home/laitathei/Desktop/darknet/VOCdevkit
-gedit yolov4-tiny.cfg
-
-[net]
-# Testing
-#batch=1
-#subdivisions=1
-# Training
-batch=64
-subdivisions=16
-width=416
-height=416
-channels=3
-momentum=0.9
-decay=0.0005
-angle=0
-saturation = 1.5
-exposure = 1.5
-hue=.1
-
-learning_rate=0.00261
-burn_in=1000
-
-max_batches = 6000    # classes*2000
-policy=steps
-steps=4800,5400       # 80% and 90% of max_batches
-scales=.1,.1
-
-[convolutional]
-size=1
-stride=1
-pad=1
-filters=255          # 3*(classes +5)
-activation=linear
-
-
-
-[yolo]
-mask = 3,4,5
-anchors = 10,14,  23,27,  37,58,  81,82,  135,169,  344,319
-classes=3            # your dataset classes
-num=6
-jitter=.3
-scale_x_y = 1.05
-cls_normalizer=1.0
-iou_normalizer=0.07
-iou_loss=ciou
-ignore_thresh = .7
-truth_thresh = 1
-random=0
-resize=1.5
-nms_kind=greedynms
-beta_nms=0.6
-#new_coords=1
-#scale_x_y = 2.0
+# Ubuntu 20.04
+sudo apt-get install ros-noetic-jsk-pcl-ros
+sudo apt-get install ros-noetic-jsk-rviz-plugins
+sudo apt-get install ros-noetic-ros-numpy
 ```
 
-### 1.7 Download YOLO weight
+### 1.4 QGC installation
 ```
-# YOLOv4-tiny
-wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
-wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.conv.29
-# YOLOv4
-wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
-wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.conv.137
+#### build from source
+sudo apt-get install speech-dispatcher libudev-dev libsdl2-dev
+cd
+git clone --recursive -j8 https://github.com/mavlink/qgroundcontrol.git
+git submodule update --recursive
+***create account for QT***
+***download the online installer from https://www.qt.io/download-qt-installer?hsCtaTracking=99d9dd4f-5681-48d2-b096-470725510d34%7C074ddad0-fdef-4e53-8aa8-5e8a876d6ab4***
+chmod +x qt-unified-linux-x64-4.1.1-online.run
+./qt-unified-linux-x64-4.1.1-online.run
+***follow https://dev.qgroundcontrol.com/master/en/getting_started/index.html QT part 2 step to install the correct version***
+sudo apt install libsdl2-dev
+_____________________________________________________________________________________________________________________________________________________________
+
+#### follow the official tutorial (https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html)
+sudo usermod -a -G dialout $USER
+sudo apt-get remove modemmanager -y
+sudo apt install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y
+***Download QGroundControl.AppImage***
+chmod +x ./QGroundControl.AppImage
+./QGroundControl.AppImage
 ```
 
-### 1.8 Data folder structure
+### 1.5 ROS Octomap installation
 ```
-├── VOCdevkit
-   ├── VOC2007
-       ├── Annotations
-       │   ├── xxx.xml
-       │   ├──   ...
-       │   
-       ├── ImageSets
-       │   ├── Main
-       │       ├── test.txt
-       │       ├── train.txt
-       │       ├── trainval.txt
-       │       ├── val.txt
-       │   
-       ├── labels
-       │   ├── xxx.txt
-       |   ├──   ...
-       │   
-       ├── JPEGImages
-       │   ├── xxx.jpg
-       |   ├──   ...
-       │   
-       └── voc2yolo4.py
-   ├── 2007_train.txt
-   ├── 2007_test.txt
-   ├── 2007_valid.txt
-   ├── train.all.txt
-   ├── train.txt
-   ├── voc.data
-   ├── voc.names
-   ├── voc_annotation.py
-   └── yolov4-tiny.cfg
+# Ubuntu 18.04
+sudo apt-get install ros-melodic-octomap-ros
+sudo apt-get install ros-melodic-octomap-msgs 
+sudo apt-get install ros-melodic-octomap-server
+sudo apt-get install ros-melodic-octomap-rviz-plugins
+sudo apt-get install ros-melodic-octomap-mapping
+sudo apt-get install ros-melodic-octomap
+
+# Ubuntu 20.04
+sudo apt-get install ros-noetic-octomap-ros
+sudo apt-get install ros-noetic-octomap-msgs 
+sudo apt-get install ros-noetic-octomap-server
+sudo apt-get install ros-noetic-octomap-rviz-plugins
+sudo apt-get install ros-noetic-octomap-mapping
+sudo apt-get install ros-noetic-octomap
 ```
 
-### 1.9 Training
+### 1.6 Python3 ROS melodic installation (if required)
 ```
-cd..
-./darknet partial cfg/yolov4-tiny.cfg yolov4-tiny.weights yolov4-tiny.conv.29 29    # optional
-./darknet detector train VOCdevkit/voc.data VOCdevkit/yolov4-tiny.cfg yolov4-tiny.conv.29
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt install curl
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+sudo apt update
+sudo apt install ros-melodic-desktop-full
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/catkin_ws/install/setup.bash --extend" >> ~/.bashrc
+sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+sudo apt install python-rosdep
 
-## Below content will show if program success
- Tensor Cores are used.
-
- 6000: 0.062273, 0.062858 avg loss, 0.000026 rate, 0.380254 seconds, 384000 images, 0.010664 hours left
-Saving weights to /home/laitathei/Desktop/darknet/backup//yolov4-tiny_6000.weights
-Saving weights to /home/laitathei/Desktop/darknet/backup//yolov4-tiny_last.weights
-Saving weights to /home/laitathei/Desktop/darknet/backup//yolov4-tiny_final.weights
-If you want to train from the beginning, then use flag in the end of training command: -clear
-```
-
-### 1.10 Evaluates Trained weight performance
-```
-./darknet detector map VOCdevkit/voc.data VOCdevkit/yolov4-tiny.cfg backup/yolov4-tiny_last.weights
-
-## Below content will show if program success
-class_id = 0, name = obstacle, ap = 0.00%   	 (TP = 0, FP = 0) 
-class_id = 1, name = human, ap = 34.97%   	 (TP = 239, FP = 2) 
-class_id = 2, name = injury, ap = 34.86%   	 (TP = 41, FP = 0) 
-
- for conf_thresh = 0.25, precision = 0.99, recall = 0.29, F1-score = 0.44 
- for conf_thresh = 0.25, TP = 280, FP = 2, FN = 698, average IoU = 83.42 % 
-
- IoU threshold = 50 %, used Area-Under-Curve for each unique Recall 
- mean average precision (mAP@0.50) = 0.232763, or 23.28 % 
-Total Detection Time: 3 Seconds
+sudo apt-get install python-pip python-yaml 
+sudo apt-get install python3-pip python3-yaml 
+sudo pip3 install rospkg catkin_pkg
+sudo apt-get install python-catkin-tools 
+sudo apt-get install python3-catkin-tools 
+sudo apt-get install python3-dev python3-numpy
+catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m -DPYTHON_LIBRARY=/usr/lib/aarch64-linux-gnu/libpython3.6m.so -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
 ```
 
-### 1.11 Inference with C++
+### 1.7 ceres-solver installation (if required)
 ```
-# YOLOv4-tiny Video
-./darknet detector demo VOCdevkit/voc.data VOCdevkit/yolov4-tiny.cfg backup/yolov4-tiny_last.weights /home/laitathei/Desktop/video_camera_color_image_raw.mp4 -out_filename /home/laitathei/Desktop/results1.mp4
-
-# YOLOv4-tiny image
-./darknet detector test ./cfg/coco.data cfg/yolov4-tiny.cfg yolov4-tiny.weights data/dog.jpg
-```
-
-### 1.12 Inference with Python
-```
-# YOLOv4-tiny Video
-python3 darknet_video.py --input /home/laitathei/Desktop/video_camera_color_image_raw.mp4 --out_filename /home/laitathei/Desktop/results1.mp4 --weights backup/yolov4-tiny_last.weights --config_file VOCdevkit/yolov4-tiny.cfg --data_file VOCdevkit/voc.data
-
-# YOLOv4-tiny Image
-python3 darknet_images.py --input /home/laitathei/Desktop/darknet/data/dog.jpg --weights yolov4-tiny.weights --config_file VOCdevkit/yolov4-tiny.cfg --data_file cfg/coco.data
-```
-
-### 1.13 Inference with ROS, Realsense, Python
-```
-python3 inference_ros.py --weights backup/yolov4-tiny_last.weights --config_file VOCdevkit/yolov4-tiny.cfg --data_file VOCdevkit/voc.data
+***get the latest stable version of ceres-solver from http://ceres-solver.org/installation.html***
+sudo apt-get install cmake
+sudo apt-get install libgoogle-glog-dev libgflags-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsuitesparse-dev
+tar zxf ceres-solver-2.0.0.tar.gz
+mkdir ceres-bin
+cd ceres-bin
+cmake ../ceres-solver-2.0.0
+make -j3
+make test
+sudo make install
 ```
 
-### 2 TensorRT conversion
-### 2.1 Download dependency
+### 1.8 Vins-Fusion (if required)
 ```
-sudo apt-get update
-sudo apt-get install -y build-essential libatlas-base-dev
-sudo apt-get install libatlas-base-dev gfortran
-sudo apt-get install python3-pip
-pip3 install numpy
-pip3 install Cython
-pip3 install pycuda --user
-pip3 install onnx==1.4.1
+sudo apt-get install cmake
+sudo apt-get install libgoogle-glog-dev libgflags-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsuitesparse-dev
 
-git clone https://github.com/jkjung-avt/tensorrt_demos
-```
+tar zxf ceres-solver-2.0.0.tar.gz
+mkdir ceres-bin
+cd ceres-bin
+cmake ../ceres-solver-2.0.0
+make -j3
+make test
+make install
 
-### 2.2 Convert Darknet model to ONNX
-```
-cd /home/laitathei/Desktop/tensorrt_demos/plugins
-make
-cd /home/laitathei/Desktop/tensorrt_demos/yolo
-cp /home/laitathei/Desktop/darknet/backup/yolov4-tiny_last.weights /home/laitathei/Desktop/tensorrt_demos/yolo/yolov4-tiny_last.weights
-cp /home/laitathei/Desktop//darknet/VOCdevkit/yolov4-tiny.cfg /home/laitathei/Desktop/tensorrt_demos/yolo/yolov4-tiny_last.cfg
-python3 yolo_to_onnx.py -m yolov4-tiny_last
-
-## Below content will show if program success
-Checking ONNX model...
-Saving ONNX file...
-Done.
-```
-
-### 2.3 Convert ONNX to TensorRT
-```
-python3 onnx_to_tensorrt.py -m yolov4-tiny_last
-
-## Below content will show if program success
-Completed creating engine.
-Serialized the TensorRT engine to file: yolov4-tiny_last.trt
-```
-
-### 2.4 Inference with Python
-```
-# YOLOv4-tiny webcam
-python3 trt_yolo.py --usb 0 -m yolov4-tiny_last
-```
-
-### 2.5 Inference with ROS, Realsense, Python
-```
-# YOLOv4-tiny
-python3 inference_ros_trt.py -m yolov4-tiny_last -c 3
+cd ~/catkin_ws/src
+git clone https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git
+cd ../
+catkin_make
+source ~/catkin_ws/devel/setup.bash
 ```
