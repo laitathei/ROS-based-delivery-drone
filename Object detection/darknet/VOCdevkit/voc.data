@@ -1,0 +1,5 @@
+classes= 3
+train  = /home/laitathei/Desktop/FYP_darknet_yolov4/darknet/VOCdevkit/2007_train.txt
+valid  = /home/laitathei/Desktop/FYP_darknet_yolov4/darknet/VOCdevkit/2007_test.txt
+names = /home/laitathei/Desktop/FYP_darknet_yolov4/darknet/VOCdevkit/voc.names
+backup = /home/laitathei/Desktop/FYP_darknet_yolov4/darknet/backup/
