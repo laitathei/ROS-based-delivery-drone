@@ -64,3 +64,27 @@
 
 
 ## pose estimation node
+### Pose index
+![Index](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/Pose_Index.jpeg)
+
+### Different function of Different version 
+
+| Version | Function |
+|:---|:---|
+|Pose_estim_V2| Single person pose detection|
+|Pose_estim_V3| Multiple people pose Estimation(with YOLOv4)|
+|Pose_estim_V3_1|Multiple people pose Estimation(with YOLOv4)|
+|Pose_estim_V4| First testing with sprating YOLO and pose estimation|
+|Pose_estim_V5| Multiple people pose Estimation(with YOLOv5)|
+
+
+### Ros Topic list
+
+
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Subscriber|/camera/color/image_raw|Image|
+|Subscriber|/camera/aligned_depth_to_color/image_raw|Image|
+|Subscriber|/camera/color/camera_info|CameraInfo|
+|Publisher|/detected_human|Image|
+|Publisher|/detected_gesture|String|
