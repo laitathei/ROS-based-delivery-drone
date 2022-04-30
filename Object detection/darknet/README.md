@@ -1,3 +1,5 @@
+### Training process come from https://github.com/AlexeyAB/darknet
+### TensorRT speed up come from https://github.com/jkjung-avt/tensorrt_demos
 ### YOLOv4-Darknet-TensorRT
 ### 1 Training in Darknet
 ### 1.1 Download YOLOv4-Darknet
