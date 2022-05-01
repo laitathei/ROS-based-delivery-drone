@@ -49,7 +49,7 @@ pip install -r requirements.txt  # install
 ```bash 
 # Start testing in Gazebo environment with control gui
 roslaunch px4 mavros_posix_sitl.launch
-roslaunch control_gui control_gui.launch
+python3 control_gui.py
 roslaunch realsense2_camera rs_camera.launch align_depth:=true
 python3 pose_estim_V5.py # Choose the version you want
 
