@@ -1,7 +1,9 @@
 # Control GUI
 
 ## Pose 
-* No.1 and 6 => Forward
-* No.2 and 3 => Left
-* No.4 and 7 => Right
-* N0.5 and 8 => Back
+|No. of the Pose|State|
+|:---:|:---:|
+|1 and 6|Forward|
+|2 and 3|Turn Left|
+|4 and 7|Turn Right|
+|5 and 8|Backward|
