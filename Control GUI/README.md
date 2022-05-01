@@ -7,7 +7,8 @@
 |2 and 3|Turn Left|
 |4 and 7|Turn Right|
 |5 and 8|Backward|
-[Pose Index](https://github.com/laitathei/ROS-based-delivery-drone/tree/main/PoseV2)
+
+*[Pose Index](https://github.com/laitathei/ROS-based-delivery-drone/tree/main/PoseV2)
 
 ## Operation guide 
 
