@@ -26,36 +26,36 @@
 ![image](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/ros_network.jpg)
 
 ## detection node
-* Publisher
-     * `/desired/input/box_array`, `BoundingBoxArray`
-     * `/detection_result/number_of_obstacle`, `Int32`
-     * `/detection_result/number_of_human`, `Int32`
-     * `/detection_result/number_of_injury`, `Int32`
-     * `/detected_human`, `Image`
-     * `/detected_human_gesture`, `String`
 
-* Subscriber
-     * `/camera/color/image_raw`, `Image`
-     * `/camera/aligned_depth_to_color/image_raw`, `Image`
-     * `/camera/aligned_depth_to_color/camera_info`, `CameraInfo`
-     * `/camera/color/camera_info`, `CameraInfo`
-     * `/desired_path/local_trajectory`, `Path`
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Publisher| /desired/input/box_array| BoundingBoxArray|
+|Publisher| /detection_result/number_of_obstacle| Int32|
+|Publisher| /detection_result/number_of_human| Int32|
+|Publisher| /detection_result/number_of_injury| Int32|
+|Publisher| /detected_human| Image|
+|Publisher| /detected_human_gesture| String|
+|Subscriber | /camera/color/image_raw| Image|
+|Subscriber | /camera/aligned_depth_to_color/image_raw| Image|
+|Subscriber | /camera/aligned_depth_to_color/camera_info| CameraInfo|
+|Subscriber | /camera/color/camera_info| CameraInfo|
+|Subscriber | /desired_path/local_trajectory| Path|
 
 ## vision navigation node
-* Publisher
-     * `/drone/input_postion/pose`, `PoseStamped`
-     * `/desired_path/position`, `MarkerArray`
-     * `/desired_path/validation_position`, `MarkerArray`
-     * `/desired_path/local_marker`, `MarkerArray`
-     * `/desired_path/local_trajectory`, `Path`
 
-* Subscriber
-     * `/drone/nagvation/pos`, `PoseStamped`
-     * `/auto_mode/status`, `BoolStamped`
-     * `/extract_indices/output`, `PointCloud2`
-     * `/detection_result/number_of_obstacle`, `Int32`
-     * `/detection_result/number_of_human`, `Int32`
-     * `/detection_result/number_of_injury`, `Int32`
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Publisher| /drone/input_postion/pose|PoseStamped|
+|Publisher| /desired_path/position|MarkerArray|
+|Publisher| /desired_path/validation_position|MarkerArray|
+|Publisher| /desired_path/local_marker|MarkerArray|
+|Publisher| /desired_path/local_trajectory|Path|
+|Subscriber| /drone/nagvation/pos|PoseStamped|
+|Subscriber| /auto_mode/status|BoolStamped|
+|Subscriber| /extract_indices/output|PointCloud2|
+|Subscriber| /detection_result/number_of_obstacle|Int32|
+|Subscriber| /detection_result/number_of_human|Int32|
+|Subscriber| /detection_result/number_of_injury|Int32|
 
 ## drone control node
 
@@ -76,6 +76,7 @@
 |Pose_estim_V3_1|Multiple people pose Estimation(with YOLOv4)|
 |Pose_estim_V4| First testing with sprating YOLO and pose estimation|
 |Pose_estim_V5| Multiple people pose Estimation(with YOLOv5)|
+|Pose_estim_V6| Multiple people pose Estimation(with YOLOv5) - Testing version|
 
 
 ### Ros Topic list
