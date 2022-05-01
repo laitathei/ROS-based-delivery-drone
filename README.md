@@ -88,3 +88,21 @@
 |Subscriber|/camera/color/camera_info|CameraInfo|
 |Publisher|/detected_human|Image|
 |Publisher|/detected_gesture|String|
+
+##  control GUI node
+
+
+### Ros Topic list
+
+
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Subscriber|/mavros/state|State|
+|Subscriber|/mavros/local_position/pose|PoseStamped|
+|Subscriber|/detected_human|Image|
+|Subscriber|/detection_result/image|Image|
+|Subscriber|/detected_human_gesture|String|
+|Subscriber|/detected_human_pos|String|
+|Publisher|/mavros/setpoint_position/local|PoseStamped|
+|Publisher|/servo/angle|AllServoAngle|
+|Publisher|/auto_mode/status|Bool|
