@@ -16,3 +16,6 @@ roslaunch px4 mavros_posix_sitl.launch
 python3 control_gui.py
 
 ```
+
+### Gazebo setup
+[Gazebo setup](https://github.com/laitathei/ROS-based-delivery-drone/tree/main/Simulation)
