@@ -1,4 +1,4 @@
-# control_gui
+# Control GUI
 
 ## Pose 
 * No.1 and 6 => Forward
