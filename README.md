@@ -58,38 +58,25 @@
 |Subscriber| /detection_result/number_of_injury|Int32|
 
 ## drone control node
-
-
-## servo node
-
-
-## pose estimation node
-### Pose index
-![Index](https://github.com/laitathei/ROS-based-delivery-drone/blob/main/figure/Pose_Index.jpeg)
-
-### Different function of Different version 
-
-| Version | Function |
-|:---|:---|
-|Pose_estim_V2| Single person pose detection|
-|Pose_estim_V3| Multiple people pose Estimation(with YOLOv4)|
-|Pose_estim_V3_1|Multiple people pose Estimation(with YOLOv4)|
-|Pose_estim_V4| First testing with sprating YOLO and pose estimation|
-|Pose_estim_V5| Multiple people pose Estimation(with YOLOv5)|
-|Pose_estim_V6| Multiple people pose Estimation(with YOLOv5) - Testing version|
-
-
-### Ros Topic list
-
-
+[Detail Refer to Repo V3.0](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node)
+### Onboard dron_control_node
 |Type|Topic|Data_type|
 |:---:|:---:|:---:|
-|Subscriber|/camera/color/image_raw|Image|
-|Subscriber|/camera/aligned_depth_to_color/image_raw|Image|
-|Subscriber|/camera/color/camera_info|CameraInfo|
-|Publisher|/detected_human|Image|
-|Publisher|/detected_gesture|String|
+|Publisher| /drone/nagvation/pos| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
+|Publisher| /auto_mode/status| [BoolStamped](http://docs.ros.org/en/indigo/api/jsk_recognition_msgs/html/msg/BoolStamped.html)|
+|Publisher| /mavros/setpoint_position/local| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
+|Publisher| /drone/current/control_status| Custom Message [GetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
+|Subscriber| /drone/input_posistion/pose| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
+|Subscriber| /mavros/local_position/pose| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
+|Subscriber| /mavros/state| [State](http://docs.ros.org/en/melodic/api/mavros_msgs/html/msg/State.html)|
+|Subscriber| /drone/set/control_status| Custom Message [SetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
+### Offboard offboard/dron_control_node
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Subscriber| /drone/current/control_status| Custom Message [GetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
+|Publisher| /drone/set/control_status| Custom Message [SetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
 
+## servo node
 ##  control GUI node
 
 
