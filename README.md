@@ -8,7 +8,9 @@
 |D455 Realsense              | 1         |
 |VESC                        | 4         |
 |Gripper                     | 1         |
-|LiPo                        | 1         |
+|LiPo (6s)                       | 1         |    
+
+P.S. highly recommand to upgrade to Pixhawk 4 mini  or Pixhawk 4     
 
 ## Software requirement
 | Name                  | Remark          |
@@ -66,6 +68,7 @@
 |Publisher| /auto_mode/status| [BoolStamped](http://docs.ros.org/en/indigo/api/jsk_recognition_msgs/html/msg/BoolStamped.html)|
 |Publisher| /mavros/setpoint_position/local| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
 |Publisher| /drone/current/control_status| Custom Message [GetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
+|Publisher| /servo/angle| [AllServoAngle](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit)|
 |Subscriber| /drone/input_posistion/pose| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
 |Subscriber| /mavros/local_position/pose| [PoseStamped](http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html)|
 |Subscriber| /mavros/state| [State](http://docs.ros.org/en/melodic/api/mavros_msgs/html/msg/State.html)|
@@ -77,6 +80,10 @@
 |Publisher| /drone/set/control_status| Custom Message [SetDroneState](https://github.com/Drone-FYP2021-PolyU-EIE/dron_control_node/tree/master/drone_control_msgs)|
 
 ## servo node
+[Detail Refer to Repo V1.5](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit)
+|Type|Topic|Data_type|
+|:---:|:---:|:---:|
+|Subscriber| /servo/angle| [AllServoAngle](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit)|
 ##  control GUI node
 
 
