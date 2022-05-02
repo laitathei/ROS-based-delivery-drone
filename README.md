@@ -83,7 +83,7 @@ P.S. highly recommand to upgrade to Pixhawk 4 mini  or Pixhawk 4
 [Detail Refer to Repo V1.5](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit)
 |Type|Topic|Data_type|
 |:---:|:---:|:---:|
-|Subscriber| /servo/angle| [AllServoAngle](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit)|
+|Subscriber| /servo/angle| Custom Message [AllServoAngle](https://github.com/Drone-FYP2021-PolyU-EIE/ROS_CircuitPython_ServoKit#allservoangle)|
 ##  control GUI node
 
 
